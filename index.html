@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trivia Game</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            max-width: 700px;
+            margin: auto;
+            padding: 2rem;
+            background-color: #fdfdfd;
+            color: #222;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .question-box {
+            background: #ffffff;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+        }
+
+        form {
+            margin-bottom: 1rem;
+        }
+
+        .difficulty-buttons,
+        .category-select {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .difficulty-buttons form {
+            display: inline-block;
+            margin: 0 0.5rem;
+        }
+
+        .category-select select {
+            padding: 0.4rem;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .answers {
+            margin-top: 1.5rem;
+        }
+
+        .answers div {
+            margin-bottom: 0.5rem;
+        }
+
+        .feedback {
+            margin-top: 1.5rem;
+            padding: 0.75rem;
+            background-color: #eef5f1;
+            border-left: 4px solid #4CAF50;
+            border-radius: 4px;
+        }
+
+        .new-question {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        button,
+        input[type="submit"] {
+            padding: 0.6rem 1.2rem;
+            font-size: 1rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        button:hover,
+        input[type="submit"]:hover {
+            background-color: #3f9142;
+        }
+
+        .alt-button {
+            background-color: white;
+            color: #4CAF50;
+            border: 2px solid #4CAF50;
+        }
+
+        .alt-button:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Trivia Game</h1>
+
+<div class="question-box">
+
+    {% if not trivia %}
+        <form action="/select_difficulty" method="post">
+            <div class="category-select">
+                <label for="category"><strong>Choose a category:</strong></label>
+                <select name="category" id="category">
+                    {% for cat in categories %}
+                        <option value="{{ cat.id }}">{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="difficulty-buttons">
+                <button type="submit" name="difficulty" value="easy">Easy</button>
+                <button type="submit" name="difficulty" value="medium">Medium</button>
+                <button type="submit" name="difficulty" value="hard">Hard</button>
+            </div>
+        </form>
+    {% endif %}
+
+    {% if trivia %}
+        <form action="/submit" method="post">
+            <p><strong>Category:</strong> {{ trivia.category }}</p>
+            <p><strong>Difficulty:</strong> {{ trivia.difficulty }}</p>
+            <p><strong>Question:</strong> {{ trivia.question }}</p>
+
+            <div class="answers">
+                {% for ans in trivia.answers %}
+                    <div>
+                        <label>
+                            <input type="radio" name="answer" value="{{ ans }}" required> {{ ans }}
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div style="margin-top: 1.5rem;">
+                <input type="hidden" name="correct_answer" value="{{ trivia.correct_answer }}">
+                <input type="hidden" name="question" value="{{ trivia.question }}">
+                <input type="hidden" name="category" value="{{ trivia.category }}">
+                <input type="hidden" name="difficulty" value="{{ trivia.difficulty }}">
+                {% for ans in trivia.answers %}
+                    <input type="hidden" name="answers" value="{{ ans }}">
+                {% endfor %}
+                <input type="submit" value="Submit Answer">
+            </div>
+        </form>
+    {% endif %}
+
+    {% if feedback %}
+        <div class="feedback">{{ feedback }}</div>
+    {% endif %}
+
+    {% if explanation %}
+        <div class="feedback"><strong>Why:</strong> {{ explanation }}</div>
+    {% endif %}
+
+    {% if trivia %}
+        <div class="new-question">
+            <form action="/new" method="post" style="display: inline-block; margin-right: 0.5rem;">
+                <button type="submit">New Question</button>
+            </form>
+            <form action="/reset" method="post" style="display: inline-block;">
+                <button type="submit" class="alt-button">Choose New Category</button>
+            </form>
+        </div>
+    {% endif %}
+
+</div>
+
+</body>
+</html>
